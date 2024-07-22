@@ -1,36 +1,7 @@
 import React from "react";
 import { FaChevronRight } from "react-icons/fa6";
-// import {GoogleAuthProvider,GithubAuthProvider, signInWithRedirect} from 'firebase/auth'
-// import { auth } from "../config/firebase.config";
 
 const AuthButtonWithProvider = ({ Icons, label, provider }) => {
-    // const googleAuthProvider = new GoogleAuthProvider()
-    // const githubAuthProvider = new GithubAuthProvider()
-    // const handleClick = async ()=>{
-    //     switch (provider) {
-    //         case "GoogleAuthProvider":
-    //             await signInWithRedirect(auth,googleAuthProvider).then((result)=>{
-    //               console.log(result)
-    //             }).catch(err =>{
-    //               console.log(`Error : ${err.Message}`)
-    //             })
-    //             break;
-    //         case "GithubAuthProvider":
-    //           await signInWithRedirect(auth,githubAuthProvider).then((result)=>{
-    //             console.log(result)
-    //           }).catch(err =>{
-    //             console.log(`Error : ${err.Message}`)
-    //           })
-    //             break;
-    //         default:
-    //           await signInWithRedirect(auth,googleAuthProvider).then((result)=>{
-    //             console.log(result)
-    //           }).catch(err =>{
-    //             console.log(`Error : ${err.Message}`)
-    //           })
-    //             break;
-    //     }
-    // }
     const handleClick = () => {
       window.location.href = `http://localhost:5555/auth/${provider.toLowerCase()}`;
     };

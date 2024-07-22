@@ -7,18 +7,18 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get('http://localhost:5555/auth/user', { withCredentials: true });
-        setUser(response.data);
-      } catch (error) {
-        console.error('Failed to fetch user:', error);
-      }finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get('http://localhost:5555/auth/user', { withCredentials: true });
+      setUser(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUser();
   }, []);
 
@@ -31,8 +31,22 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = async (userId, updatedData) => {
+    try {
+      const response = await axios.put(`http://localhost:5555/auth/user/${userId}`, updatedData, { withCredentials: true });
+      setUser(response.data);
+    } catch (error) {
+      console.error('Failed to update user:', error);
+    }
+  };
+
+  const refetch = async () => {
+    setIsLoading(true);
+    await fetchUser();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading ,signOutUser}}>
+    <AuthContext.Provider value={{ user, isLoading, signOutUser, updateUser, refetch }}>
       {children}
     </AuthContext.Provider>
   );

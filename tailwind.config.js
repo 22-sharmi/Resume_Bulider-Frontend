@@ -11,8 +11,13 @@ module.exports = {
         txtDark : "#222",
         bgPrimary : "#f1f1f1"
       },
+      width: {
+        'ssm': '320px',
+        'msm': '375px',
+        'lsm': '425px',
+      },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar')],
 }
 
