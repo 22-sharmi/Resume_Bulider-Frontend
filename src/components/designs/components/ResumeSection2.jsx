@@ -199,8 +199,8 @@ export default function ResumeSection2({ resume, updateResumeData }) {
               onLoad={() => setImageLoaded(true)}
             />
             <div className="h-20 flex items-center justify-center">
-              <h3 className="text-xl bg-yellow-400 text-black px-2 py-1 mb-2">
-                {personalInfo.subtitle}
+              <h3 className="text-base bg-yellow-400 text-black px-2 py-1 mb-2">
+                {personalInfo?.subtitle}
               </h3>
             </div>
           </div>
@@ -250,14 +250,14 @@ export default function ResumeSection2({ resume, updateResumeData }) {
         <div className="w-2/3">
           <div className="mb-6 bg-gray-200 h-auto p-10">
             <h1 className="text-4xl font-bold text-txtDark">
-              {personalInfo.title}
+              {personalInfo?.title}
             </h1>
             <h2 className="mt-2 text-2xl text-gray-600">
-              {personalInfo.subtitle}
+              {personalInfo?.subtitle}
             </h2>
             <div className="mt-4">
               <Section title="PROFILE">
-                <p>{personalInfo.description}</p>
+                <p>{personalInfo?.description}</p>
               </Section>
             </div>
           </div>

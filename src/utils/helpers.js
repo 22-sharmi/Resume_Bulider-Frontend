@@ -1,4 +1,4 @@
-import { Template1, Template2 } from "../components/designs";
+import { Template1, Template2,Template3} from "../components/designs";
 
 export const adminIds = [
   "6688ef93837289eb4a9d118f",
@@ -62,4 +62,5 @@ export const FiltersData = [
 export const TemplatesData = [
   { id: `template-${Date.now()}`, name: 'template1', component: Template1 },
   { id: `template-${Date.now()}`, name: 'template2', component: Template2 },
+  { id: `template-${Date.now()}`, name: 'template3', component: Template3 },
 ];

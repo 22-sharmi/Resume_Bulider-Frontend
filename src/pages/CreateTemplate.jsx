@@ -64,7 +64,8 @@ const CreateTemplate = () => {
         );
         setImageAssets((prevAsset) => ({
           ...prevAsset,
-          url: `http://localhost:5555/api/images/${response.data.url}`, // Use the image ID for URL
+          url: `http://localhost:5555${response.data.url}`,
+          // url: `http://localhost:5555/api/images/${response.data.url}`,
         }));
         toast.success("Image uploaded!");
       } catch (error) {
