@@ -10,6 +10,9 @@ import { Link, useNavigate } from "react-router-dom";
 import Resume from "./components/Resume3";
 import MainSpinner from "../MainSpinner";
 import { AiFillWarning } from "react-icons/ai";
+import ResumeMobile from "./components/ResumeMobile3";
+import Resume3 from "./components/Resume3";
+import ResumeMobile3 from "./components/ResumeMobile3";
 
 function Template1() {
   const {
@@ -42,7 +45,10 @@ function Template1() {
       </div>
 
       <div className="md:block hidden">
-            <Resume resume={resume} updateResumeData={updateResumeData} />
+            <Resume3 resume={resume} updateResumeData={updateResumeData} />
+          </div>
+          <div className="block md:hidden">
+          <ResumeMobile3 resume={resume} updateResumeData={updateResumeData} />
           </div>
           <div className="flex flex-col justify-center items-center gap-4 border border-dotted border-yellow-500 mx-7 md:hidden p-4 bg-yellow-50 rounded-lg shadow-lg">
       <div className="flex items-center gap-3">
@@ -65,37 +71,6 @@ function Template1() {
         We are creating a responsive template for mobile screens. Please be patient, the mobile-friendly version will be available soon.
       </p>
     </div>
-
-      {/* <div className="grid grid-cols-1 lg:grid-cols-12 h-screen bg-gray-100 gap-4 mx-auto"> */}
-        {/* <div className="col-span-1 lg:col-span-4">
-        <LeftSidebar resume={resume} updateResumeData={updateResumeData} />
-      </div> */}
-
-        {/* <div className="col-span-1 md:col-span-2 lg:col-span-8 flex flex-col mx-auto"> */}
-          {/* <div className="flex justify-end gap-3 p-4 mr-20">
-          <button
-            onClick={saveResume}
-            className="border flex items-center gap-2 border-gray-500 text-txtDark px-4 py-2  hover:text-white hover:bg-gray-500 rounded-md"
-          >
-            <BiSolidBookmarks className="text-sm" />
-            Save
-          </button>
-          <button
-            onClick={generatePDF}
-            className="border flex items-center gap-2 border-gray-500 text-txtDark px-4 py-2  hover:text-white hover:bg-gray-500 rounded-md"
-          >
-            <BsFiletypePdf className="text-2xl cursor-pointer" />
-            Download PDF
-          </button>
-        </div> */}
-          
-          {/* <ResumeSection resume={resume} updateResumeData={updateResumeData} /> */}
-        {/* </div> */}
-
-        {/* <div className="col-span-1 lg:col-span-3">
-        <RightSidebar updateResumeData={updateResumeData} />
-      </div> */}
-      {/* </div> */}
     </>
   );
 }

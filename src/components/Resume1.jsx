@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { FaTrash, FaPlus, FaPenToSquare, FaPencil } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import { TemplateOne } from "../assets";
-import { MainSpinner } from "../components";
+import { MainSpinner } from ".";
 import { BiSolidBookmarks } from "react-icons/bi";
 import { BsFiletypePdf } from "react-icons/bs";
 import { useResume } from "../hooks/useResume";
@@ -10,7 +10,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import StyleControls from "../utils/StyleControls";
 
-const Resume = ({ resume, updateResumeData }) => {
+const Resume1 = ({ resume, updateResumeData }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [localResume, setLocalResume] = useState(resume);
   const { generatePDF } = useResume();
@@ -607,4 +607,4 @@ const Section = ({ title, children }) => {
   );
 };
 
-export default Resume;
+export default Resume1;

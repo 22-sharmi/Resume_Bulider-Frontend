@@ -3,7 +3,7 @@ import { Header, MainSpinner } from '../components'
 import { Route, Routes } from 'react-router-dom'
 import { HomeContainer } from '../containers'
 import {CreateResume, CreateTemplate, TemplateDesignPinDetails, UserProfile} from '../pages'
-import Template from '../components/Template'
+import Template from '../components/Resume1'
 
 const HomeScreen = () => {
   return (
@@ -18,7 +18,7 @@ const HomeScreen = () => {
               <Route path='/profile/:_id' element={<UserProfile/>} />
               <Route path='/resume/*' element={<CreateResume/>} />
               <Route path='/resumeDetail/:templateID' element={<TemplateDesignPinDetails/>} />
-              <Route path='/templ' element={<Template/>} />
+              {/* <Route path='/templ' element={<Template/>} /> */}
             </Routes>
            </Suspense>
         </main>

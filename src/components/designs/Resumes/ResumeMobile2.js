@@ -1,4 +1,10 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useContext,
+} from "react";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -9,22 +15,42 @@ import {
   FaMinus,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useResume } from "../../../hooks/useResume";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BsFiletypePdf } from "react-icons/bs";
 import { BiSolidBookmarks } from "react-icons/bi";
 import { FaPenToSquare } from "react-icons/fa6";
+import { useReactToPrint } from "react-to-print";
+import { AuthContext } from "../../../contexts/AuthContext";
 
-const ResumeMobile = ({ resume, updateResumeData }) => {
+const ResumeMobile2 = ({ resume, updateResumeData }) => {
   const [step, setStep] = useState(0);
   const [localResume, setLocalResume] = useState(resume || {});
   const [showPreview, setShowPreview] = useState(false);
-  const { generatePDF } = useResume();
-  const [imageURL, setImageURL] = useState(
-    resume?.personalInfo?.photo
-  );
+  const [imageURL, setImageURL] = useState(resume?.personalInfo?.photo);
   const fileInputRef = useRef(null);
+  const [isContentReady, setIsContentReady] = useState(false);
+  const resumeContentRef = useRef(null);
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentReady(true);
+    }, 1000); // Adjust this delay as needed
+
+    return () => clearTimeout(timer);
+  }, [localResume]);
+
+  const handlePrint = useReactToPrint({
+    content: () => resumeContentRef.current,
+    documentTitle: user?.displayName
+      ? `${user.displayName}'s Resume`
+      : "Resume",
+    onAfterPrint: () => {
+      toast.success("Printed PDF successfully!");
+      console.log("Printed PDF successfully!");
+    },
+  });
 
   const sections = [
     { title: "Personal Info", key: "personalInfo" },
@@ -86,10 +112,12 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
           );
           const newImageURL = `http://localhost:5555${response.data.url}`;
           setImageURL(newImageURL);
-          updateResumeData({
+          const updatedResume = {
             ...localResume,
             personalInfo: { ...localResume.personalInfo, photo: newImageURL },
-          });
+          };
+          setLocalResume(updatedResume);
+          updateResumeData(updatedResume);
           toast.success("Image uploaded!");
         } catch (error) {
           toast.error(`Error: ${error.message}`);
@@ -205,17 +233,17 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
                   className="hidden"
                 />
                 <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <img
-                src={resume?.personalInfo?.photo}
-                alt="Profile"
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={handleImageClick}
-              />
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <img
+                  src={resume?.personalInfo?.photo}
+                  alt="Profile"
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={handleImageClick}
+                />
                 {localResume.personalInfo?.photo && (
                   <img
                     src={localResume.personalInfo.photo}
@@ -329,12 +357,16 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
           <div className="w-2/5 bg-gray-900 text-white p-4">
             {localResume.personalInfo?.photo && (
               <img
-                src={localResume.personalInfo.photo}
+                src={localResume.personalInfo?.photo}
                 alt="Profile"
                 className="w-full mb-4 rounded-md"
               />
             )}
-
+            <div className="bg-yellow-500 px-3 py-2 mb-4">
+              <p className="text-xs uppercase text-center text-txtPrimary">
+                {localResume.personalInfo?.subtitle}
+              </p>
+            </div>
             <h3 className="text-lg font-semibold mb-2 border-b border-yellow-500">
               EDUCATION
             </h3>
@@ -345,81 +377,71 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
                 <p>{edu.date}</p>
               </div>
             ))}
-
             <h3 className="text-lg font-semibold mb-2 mt-4 border-b border-yellow-500">
-              PROJECTS
+              SKILLS
             </h3>
-            {(localResume.Projects || []).map((project, index) => (
-              <div key={index} className="mb-2">
-                <a href={project.link}>
-                  {" "}
-                  <p className="font-bold">{project.name}</p>
-                </a>
-                <p>{project.description}</p>
+            {(localResume.Skills || []).map((skillGroup, groupIndex) =>
+              skillGroup.skills.map((skill, index) => (
+                <div key={`${groupIndex}-${index}`} className="mb-2">
+                  <p className="font-semibold">{skill.name}</p>
+                  <div className="w-full bg-gray-500 rounded-full h-1">
+                    <div
+                      className="bg-yellow-500 h-1 rounded-full"
+                      style={{ width: `${skill.level}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+            <h3 className="text-lg font-semibold mb-2 mt-4 border-b border-yellow-500">
+              CONTACT
+            </h3>
+            {(localResume.Contact || []).map((contact, index) => (
+              <div key={index}>
+                <p className="font-semibold">{contact.label}</p>
+                <p>{contact.value}</p>
               </div>
             ))}
-
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2 mt-4 border-b border-yellow-500">
-                CONTACT
-              </h3>
-              {(localResume.Contact || []).map((contact, index) => (
-                <div key={index}>
-                  <p className="font-semibold">{contact.label}</p>
-                  <p>{contact.value}</p>
-                </div>
-              ))}
-            </div>
           </div>
-
-          <div className="w-2/3 py-4">
-            <div className="bg-yellow-500">
+          <div className="w-3/5 p-4">
+            <div className="bg-gray-200">
               <h2 className="text-2xl font-bold mb-2">
                 {localResume.personalInfo?.title}
               </h2>
-              <p className="mb-4">{localResume.personalInfo?.subtitle}</p>
-            </div>
-            <div className="pl-1">
+              <p className="text-xs uppercase text-txtPrimary">
+                {localResume.personalInfo?.subtitle}
+              </p>
+              <div className="mb-4">
               <h3 className="text-xl font-semibold mb-2 border-b border-gray-300">
-                ABOUT ME
+                PROFILE
               </h3>
-              <p className="mb-4">{localResume.personalInfo?.description}</p>
-
+              <p>{localResume.personalInfo?.description}</p>
+            </div>
+            </div>
+            <div className="mb-4">
               <h3 className="text-xl font-semibold mb-2 border-b border-gray-300">
-                EXPERIENCE
+                WORK EXPERIENCE
               </h3>
               {(localResume.Experience || []).map((exp, index) => (
-                <div key={index} className="mb-4">
-                  <p className="font-bold">{exp.company}</p>
-                  <p>{exp.position}</p>
+                <div key={index} className="mb-2">
+                  <p className="font-bold">{exp.position}</p>
+                  <p>{exp.company}</p>
                   <p>{exp.date}</p>
                   <p>{exp.description}</p>
                 </div>
               ))}
-
+            </div>
+            <div>
               <h3 className="text-xl font-semibold mb-2 border-b border-gray-300">
-                SKILLS
+                PROJECTS
               </h3>
-              {(localResume.Skills || []).map((skillGroup, groupIndex) => (
-                <div key={groupIndex} className="mb-4">
-                  {/* <h4 className="font-semibold mb-2">Skill Group {groupIndex + 1}</h4> */}
-                  {(skillGroup.skills || []).map((skill, skillIndex) => (
-                    <div
-                      key={skillIndex}
-                      className="flex items-center gap-2 mb-2"
-                    >
-                      <p className="font-bold">{skill.name}</p>
-                      <div className="relative mt-1 w-full h-1 rounded-md bg-gray-400">
-                        <div
-                          className="h-full rounded-md bg-yellow-500"
-                          style={{
-                            width: `${skill.level}%`,
-                            transition: "width 0.3s ease",
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
+              {(localResume.Projects || []).map((project, index) => (
+                <div key={index} className="mb-2">
+                  <p className="font-bold">{project.name}</p>
+                  <p>{project.description}</p>
+                  <a href={project.link} className="text-blue-500">
+                    {project.link}
+                  </a>
                 </div>
               ))}
             </div>
@@ -428,113 +450,6 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
       </div>
     );
   };
-
-  // const renderPreview = () => {
-  //     return (
-  //       <div className="bg-white rounded shadow" id='resume-content'>
-  //         <div className="flex">
-  //           <div className="w-2/5 bg-gray-900 text-white p-4">
-  //             {localResume.personalInfo?.photo && (
-  //               <img src={localResume.personalInfo.photo} alt="Profile" className="w-full mb-4 rounded-md" />
-  //             )}
-
-  //             <h3 className="text-lg font-semibold mb-2 border-b border-yellow-500">EDUCATION</h3>
-  //             {(localResume.Education || []).map((edu, index) => (
-  //               <div key={index} className="mb-2">
-  //                 <p className="font-bold">{edu.degree}</p>
-  //                 <p>{edu.university}</p>
-  //                 <p>{edu.date}</p>
-  //               </div>
-  //             ))}
-
-  //             <h3 className="text-lg font-semibold mb-2 mt-4 border-b border-yellow-500">Projects</h3>
-  //             {localResume?.Projects?.map((project, index) => (
-  //             <div key={`pro-${index}`} className="mb-2">
-  //               <a href={project.link}> <p className="font-bold">{project.name}</p></a>
-  //               <p>{project.description}</p>
-  //             </div>
-  //           ))}
-
-  //             <div className="mt-4">
-  //               <h3 className="text-lg font-semibold mb-2 border-b border-yellow-500">CONTACT</h3>
-  //             {localResume?.Contact?.map((contact, index) => (
-  //               <div key={index}>
-  //                 <p className='font-semibold'>{contact.label}</p>
-  //                 <p>{contact.value}</p>
-  //               </div>
-  //             ))}
-  //             </div>
-  //           </div>
-
-  //           <div className="w-2/3 py-4">
-
-  //          <div className='bg-yellow-500'>
-  //          <h2 className="text-2xl font-bold mb-2">{localResume.personalInfo?.title}</h2>
-  //             <p className="mb-4">{localResume.personalInfo?.subtitle}</p>
-  //          </div>
-  //         <div className='pl-1'>
-  //          <h3 className="text-xl font-semibold mb-2 border-b border-gray-300">ABOUT ME</h3>
-  //          <p className="mb-4">{localResume.personalInfo?.description}</p>
-
-  //             <h3 className="text-xl font-semibold mb-2 border-b border-gray-300">WORK EXPERIENCE</h3>
-  //             {(localResume.Experience || []).map((exp, index) => (
-  //               <div key={index} className="mb-4 flex gap-2">
-  //                 <p>{exp.date}</p>
-  //                 <div><p className="font-bold">{exp.position}</p>
-  //                 <p>{exp.company}</p>
-  //                 <p>{exp.description}</p></div>
-  //               </div>
-  //             ))}
-
-  //             <h3 className="text-xl font-semibold mb-2 border-b border-gray-300">SOFTWARE SKILLS</h3>
-  //             <div className="grid grid-cols-2 gap-2">
-  //               {(localResume.Skills || []).flatMap(group => group.skills || []).map((skill, index) => (
-  //                 <div key={index} className="flex flex-col justify-between">
-  //                   <span>{skill.name}</span>
-  //                   <div className="relative mt-1 w-full h-1 rounded-md bg-gray-400">
-  //                           <div
-  //                             className="h-full rounded-md bg-yellow-500"
-  //                             style={{
-  //                               width: `${skill.level}%`,
-  //                               transition: "width 0.3s ease",
-  //                             }}
-  //                           ></div>
-  //                         </div>
-  //                 </div>
-  //               ))}
-  //             </div>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     );
-  //   };
-
-  // return (
-  //   <div className="flex justify-center">
-  //     {showPreview? (
-  //       renderPreview()
-  //     ) : (
-  //       <div className="w-2/3 p-4">
-  //         {renderSection()}
-  //         <div className="flex justify-between mt-4">
-  //           <button
-  //             onClick={handlePrevious}
-  //             className="bg-blue-500 text-white p-2 rounded"
-  //           >
-  //             Previous
-  //           </button>
-  //           <button
-  //             onClick={handleNext}
-  //             className="bg-blue-500 text-white p-2 rounded"
-  //           >
-  //             {step < sections.length - 1? 'Next' : 'Preview'}
-  //           </button>
-  //         </div>
-  //       </div>
-  //     )}
-  //   </div>
-  // );
   return (
     <div className="block md:hidden p-4">
       {!showPreview ? (
@@ -570,7 +485,11 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.5 }}
         >
-          {renderPreview()}
+          <div ref={resumeContentRef} className="bg-white rounded shadow">
+            {/* ... resume content */}
+            {renderPreview()}
+          </div>
+
           <div className="flex justify-between mt-4">
             <button
               onClick={() => setShowPreview(false)}
@@ -579,19 +498,20 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
               <FaPenToSquare className="mr-2" /> Edit
             </button>
             <button
-            className="border flex items-center gap-2 border-gray-500 text-txtDark px-2 md:px-4 py-2 hover:text-white hover:bg-gray-500 rounded-md"
-            onClick={handleSave}
-          >
-            <BiSolidBookmarks className="text-sm" />
-            Save
-          </button>
-          <button
-            onClick={generatePDF}
-            className="border flex items-center gap-2 border-gray-500 text-txtDark px-2 md:px-4 py-2 hover:text-white hover:bg-gray-500 rounded-md"
-          >
-            <BsFiletypePdf className="text-2xl cursor-pointer" />
-            Download PDF
-          </button>
+              className="border flex items-center gap-2 border-gray-500 text-txtDark px-2 md:px-4 py-2 hover:text-white hover:bg-gray-500 rounded-md"
+              onClick={handleSave}
+            >
+              <BiSolidBookmarks className="text-sm" />
+              Save
+            </button>
+            <button
+              //  onClick={generatePDF}
+              onClick={handlePrint}
+              className="border flex items-center gap-2 border-gray-500 text-txtDark px-2 md:px-4 py-2 hover:text-white hover:bg-gray-500 rounded-md"
+            >
+              <BsFiletypePdf className="text-2xl cursor-pointer" />
+              Download PDF
+            </button>
           </div>
         </motion.div>
       )}
@@ -599,4 +519,4 @@ const ResumeMobile = ({ resume, updateResumeData }) => {
   );
 };
 
-export default ResumeMobile;
+export default ResumeMobile2;
